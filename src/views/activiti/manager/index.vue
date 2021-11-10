@@ -292,7 +292,7 @@ export default {
         if (response.data.success) {
           this.open = false
           this.$router.push({
-            path: "bpmnDesign",
+            path: "/activiti/bpmnDesign",
             query: {xmlStr: response.data.xmlStr, createProcessParams: this.createProcessParams}
           });
         } else {

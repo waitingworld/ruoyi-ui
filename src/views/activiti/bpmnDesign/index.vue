@@ -46,8 +46,8 @@ import camundaPropertiesProviderModule from 'bpmn-js-properties-panel/lib/provid
 //camunda描述文件
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda'
 
-import activitiPropertiesPanelModule from 'bpmn-js-properties-panel-activiti';
-import activitiPropertiesProviderModule from 'bpmn-js-properties-panel-activiti/lib/provider/activiti';
+// import activitiPropertiesPanelModule from 'bpmn-js-properties-panel-activiti';
+// import activitiPropertiesProviderModule from 'bpmn-js-properties-panel-activiti/lib/provider/activiti';
 import activitiModdleDescriptor from 'activiti-bpmn-moddle/resources/activiti.json';
 //翻译模块
 import customTranslate from '@/components/BpmnJs/customTranslate/customTranslate'
@@ -119,17 +119,21 @@ export default {
         tokenSimulation
       ];
       var moddleExtensions = {}
+      // 左边工具栏以及节点
+      additionalModules.push(camundaPropertiesProviderModule)
+      // 右边的工具栏
+      additionalModules.push(camundaPropertiesPanelModule)
       if (this.camundaFlag) {
-        // 左边工具栏以及节点
-        additionalModules.push(camundaPropertiesProviderModule)
-        // 右边的工具栏
-        additionalModules.push(camundaPropertiesPanelModule)
+        // // 左边工具栏以及节点
+        // additionalModules.push(camundaPropertiesProviderModule)
+        // // 右边的工具栏
+        // additionalModules.push(camundaPropertiesPanelModule)
         moddleExtensions = {camunda: camundaModdleDescriptor}
       } else {
-        // 左边工具栏以及节点
-        additionalModules.push(activitiPropertiesProviderModule)
-        // 右边的工具栏
-        additionalModules.push(activitiPropertiesPanelModule)
+        // // 左边工具栏以及节点
+        // additionalModules.push(activitiPropertiesProviderModule)
+        // // 右边的工具栏
+        // additionalModules.push(activitiPropertiesPanelModule)
         moddleExtensions = {activiti: activitiModdleDescriptor}
       }
       // 建模，官方文档这里讲的很详细
@@ -264,6 +268,7 @@ export default {
     getProcessXmlByModelId(modelId) {
       this.loading = true
       getProcessXmlByModelId({modelId: modelId}).then(res => {
+        debugger
         this.loading = false
         this.xmlStr = res.data.xmlStr
         this.init()
