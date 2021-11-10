@@ -58,7 +58,20 @@
     "vue-meta": "^2.4.0",
     "vue-router": "3.4.9",
     "vuedraggable": "2.24.3",
-    "vuex": "3.6.0"
+    "vuex": "3.6.0",
+    "activiti-bpmn-moddle": "^4.4.0",
+    "bpmn-js": "^8.0.1",
+    "bpmn-js-bpmnlint": "^0.16.0",
+    "bpmn-js-properties-panel": "^0.38.1",
+    "bpmn-js-properties-panel-activiti": "^0.33.1",
+    "bpmn-js-token-simulation": "^0.11.1",
+    "bpmnlint": "^7.1.0",
+    "bpmnlint-loader": "^0.1.4",
+    "camunda-bpmn-moddle": "^4.5.0",
+    "camunda-modeler-plugin-helpers": "^3.1.0",
+    "diagram-js-minimap": "^2.0.4",
+    "jquery": "^3.5.1",
+    "vue-codemirror": "^4.0.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "4.4.6",
