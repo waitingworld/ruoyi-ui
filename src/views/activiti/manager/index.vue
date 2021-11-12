@@ -62,13 +62,17 @@
           <el-table-column label="序号" align="center" type="index" width="50"/>
           <!--          <el-table-column label="编号" align="center" key="deploymentId" prop="deploymentId" v-if="columns[0].visible"/>-->
           <el-table-column label="流程名称" align="center" key="name" prop="name" v-if="columns[1].visible"
-                           :show-overflow-tooltip="true"/>
+                           :show-overflow-tooltip="true"
+          />
           <el-table-column label="流程类型" align="center" key="category" prop="category" v-if="columns[2].visible"
-                           :show-overflow-tooltip="true"/>
+                           :show-overflow-tooltip="true"
+          />
           <el-table-column label="流程版本" align="center" key="version" prop="version" v-if="columns[3].visible"
-                           width="80"/>
+                           width="80"
+          />
           <el-table-column label="流程描述" align="center" key="description" prop="description" v-if="columns[4].visible"
-                           :show-overflow-tooltip="true"/>
+                           :show-overflow-tooltip="true"
+          />
           <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[5].visible" width="160">
             <template slot-scope="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -79,8 +83,15 @@
               <span>{{ parseTime(scope.row.deploymentTime) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+          <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
             <template slot-scope="scope">
+              <el-button
+                size="mini"
+                type="text"
+                icon="el-icon-video-play"
+                @click="startProcess(scope.row)"
+              >启动
+              </el-button>
               <el-button
                 size="mini"
                 type="text"
@@ -138,13 +149,20 @@
 </template>
 
 <script>
-import {listCatgoryTree, listWorkFlow, createProcess, deleteProcessDefind} from "@/api/activiti/repository";
-import Treeselect from "@riophae/vue-treeselect";
-import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+import {
+  listCatgoryTree,
+  listWorkFlow,
+  createProcess,
+  deleteProcessDefind,
+  completeTask,
+  startProcess
+} from '@/api/activiti/repository'
+import Treeselect from '@riophae/vue-treeselect'
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 export default {
-  name: "Manager",
-  components: {Treeselect},
+  name: 'Manager',
+  components: { Treeselect },
   data() {
     return {
       // 遮罩层
@@ -158,14 +176,14 @@ export default {
       // 是否显示弹出层
       open: false,
       // 弹出层标题
-      title: "",
+      title: '',
       // 类型树选项
       catgoryOptions: undefined,
       // 流程类型名称
       catgoryName: undefined,
       defaultProps: {
-        children: "children",
-        label: "label"
+        children: 'children',
+        label: 'label'
       },
       // 查询参数
       queryParams: {
@@ -176,13 +194,13 @@ export default {
       },
       // 列信息
       columns: [
-        {key: 0, label: `编号`, visible: true},
-        {key: 1, label: `流程名称`, visible: true},
-        {key: 2, label: `流程类型`, visible: true},
-        {key: 3, label: `流程版本`, visible: true},
-        {key: 4, label: `流程描述`, visible: true},
-        {key: 5, label: `创建时间`, visible: true},
-        {key: 6, label: `部署时间`, visible: true},
+        { key: 0, label: `编号`, visible: true },
+        { key: 1, label: `流程名称`, visible: true },
+        { key: 2, label: `流程类型`, visible: true },
+        { key: 3, label: `流程版本`, visible: true },
+        { key: 4, label: `流程描述`, visible: true },
+        { key: 5, label: `创建时间`, visible: true },
+        { key: 6, label: `部署时间`, visible: true }
       ],
       //创建流程
       createProcessParams: {
@@ -193,90 +211,112 @@ export default {
       },
       rules: {
         processName: [
-          {required: true, message: "流程名称不能为空(必须全中文)", trigger: "blur", pattern: /^[u4e00-\u9fa5]+$/}
+          { required: true, message: '流程名称不能为空(必须全中文)', trigger: 'blur', pattern: /^[u4e00-\u9fa5]+$/ }
         ],
         processKey: [
           {
             required: true,
-            message: "流程Key不能为空(字母开头的字母、数字、_和-组合)",
-            trigger: "blur",
+            message: '流程Key不能为空(字母开头的字母、数字、_和-组合)',
+            trigger: 'blur',
             pattern: /^[a-zA-Z][A-Za-z0-9_\-]+$/ig
           }
         ],
         category: [
-          {required: true, message: "流程类型不能为空", trigger: "blur"}
+          { required: true, message: '流程类型不能为空', trigger: 'blur' }
         ],
         description: [
-          {required: true, message: "流程说明不能为空", trigger: "blur"}
+          { required: true, message: '流程说明不能为空', trigger: 'blur' }
         ]
       }
-    };
+    }
   },
   watch: {
     // 根据名称筛选部门树
     catgoryName(val) {
-      this.$refs.tree.filter(val);
+      this.$refs.tree.filter(val)
     }
   },
   created() {
-    this.getList();
-    this.getTreeSelect();
+    this.getList()
+    this.getTreeSelect()
   },
   methods: {
+    startProcess(processInfo) {
+      let startProcessParams = {
+        processDefinitionKey: processInfo.key,
+        variablesJson: {}
+      }
+      startProcess(startProcessParams).then(res => {
+        if (res.code === 200) {
+          this.$message.success(res.msg)
+        }
+      })
+    },
+    completeTask(taskId, variablesJson) {
+      let completeTaskParams = {
+        taskId: taskId,
+        variablesJson: variablesJson
+      }
+      completeTask(completeTaskParams).then(res => {
+        if (res.code === 200) {
+          this.$message.success(res.msg)
+        }
+      })
+    },
     editProcess(processInfo) {
       this.$router.push({
-        path: "bpmnDesign",
-        query: {modelId: processInfo.modelId}
-      });
+        path: 'bpmnDesign',
+        query: { modelId: processInfo.modelId }
+      })
     },
     /**
      * 查询用户列表 */
     getList() {
-      this.loading = true;
+      this.loading = true
       listWorkFlow(this.queryParams).then(response => {
-          this.flowList = response.data.flowList;
-          this.total = response.data.total;
-          this.loading = false;
+          this.flowList = response.data.flowList
+          this.total = response.data.total
+          this.loading = false
         }
-      );
+      )
     },
     /**
      * 查询部门下拉树结构 */
     getTreeSelect() {
       listCatgoryTree({}).then(response => {
-        this.catgoryOptions = response.data.catgory;
-      });
+        this.catgoryOptions = response.data.catgory
+      })
     },
     /**
      * 筛选节点*/
     filterNode(value, data) {
-      if (!value) return true;
-      return data.label.indexOf(value) !== -1;
+      if (!value) return true
+      return data.label.indexOf(value) !== -1
     },
     /**
      * 节点单击事件*/
     handleNodeClick(data) {
-      this.queryParams.processDefinitionCategory = data.id;
-      this.getList();
+      this.queryParams.processDefinitionCategory = data.id
+      this.getList()
     },
     /**
      * 取消按钮*/
     cancel() {
-      this.reset();
+      this.reset()
     },
     /**
      * 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNo = 1;
-      this.getList();
+      this.queryParams.pageNo = 1
+      this.getList()
     },
     /**
      * 重置按钮操作 */
     resetQuery() {
       this.queryParams.processDefinitionCategory = undefined
-      this.resetForm("queryForm");
-      this.getTreeSelect();
-      this.handleQuery();
+      this.resetForm('queryForm')
+      this.getTreeSelect()
+      this.handleQuery()
     },
     /**
      * 添加新的流程
@@ -292,9 +332,9 @@ export default {
         if (response.data.success) {
           this.open = false
           this.$router.push({
-            path: "/activiti/bpmnDesign",
-            query: {xmlStr: response.data.xmlStr, createProcessParams: this.createProcessParams}
-          });
+            path: '/activiti/bpmnDesign',
+            query: { xmlStr: response.data.xmlStr, createProcessParams: this.createProcessParams }
+          })
         } else {
           this.$message.error(response.data.msg)
         }
@@ -307,33 +347,34 @@ export default {
         processKey: undefined,
         category: undefined,
         description: undefined
-      };
-      this.resetForm("createProcessParams");
+      }
+      this.resetForm('createProcessParams')
     },
     // 流程删除
     deleteProcessDefind(process) {
       debugger
       if (!process.deploymentId) {
-        this.$message.error("当前流程未部署过，不能删除")
+        this.$message.error('当前流程未部署过，不能删除')
         return
       }
-      this.$confirm('是否确认删除' + process.name + '流程?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
+      this.$confirm('是否确认删除' + process.name + '流程?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(function() {
         let params = {
           deploymentId: process.deploymentId
         }
         deleteProcessDefind(params).then(res => {
           if (res.success) {
             this.resetQuery()
-            this.$message.success("删除成功")
+            this.$message.success('删除成功')
           }
         })
-      }).catch(() => {});
+      }).catch(() => {
+      })
 
     }
   }
-};
+}
 </script>

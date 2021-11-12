@@ -52,3 +52,56 @@ export function deleteProcessDefind(params) {
     data: params
   })
 }
+
+// 获取代办列表
+export function getTodoList(params) {
+  return request({
+    url: '/activiti/task/getTodoList',
+    method: 'post',
+    data: params
+  })
+}
+
+// 获取已办列表
+export function getDoneList(params) {
+  return request({
+    url: '/activiti/task/getDoneList',
+    method: 'post',
+    data: params
+  })
+}
+
+// 启动流程
+export function startProcess(params) {
+  return request({
+    url: '/activiti/process/startProcess',
+    method: 'post',
+    data: params
+  })
+}
+
+// 完成节点
+export function completeTask(params) {
+  return request({
+    url: '/activiti/task/completeTask',
+    method: 'post',
+    data: params
+  })
+}
+
+// 获取下一个节点
+export function getNextNode(params) {
+  return request({
+    url: '/activiti/task/getNextNode',
+    method: 'post',
+    data: params
+  })
+}
+// 获取下一个节点
+export function getTaskInfo(params) {
+  return request({
+    url: '/activiti/task/getTaskInfo',
+    method: 'post',
+    data: params
+  })
+}

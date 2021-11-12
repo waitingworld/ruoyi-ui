@@ -72,7 +72,7 @@ export default {
       bpmnModeler: null,
       canvas: null,
       loading: false,
-      camundaFlag: false,//是使用camunda,否则使用activiti
+      camundaFlag: true,//是使用camunda,否则使用activiti
       onlyViewFlag: false,//仅显示主窗口标识
       miniMapOpenFlag: true,//小地图开关
       showXmlFlag: false,//xml编辑器开关
