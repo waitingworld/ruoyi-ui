@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import VueBus from 'vue-bus'
 
 import Cookies from 'js-cookie'
 
@@ -90,6 +91,7 @@ Vue.component('ImageUpload', ImageUpload)
 Vue.use(directive)
 Vue.use(plugins)
 Vue.use(VueMeta)
+Vue.use(VueBus)
 DictData.install()
 
 /**

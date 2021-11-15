@@ -44,6 +44,15 @@ export function getProcessXmlByModelId(params) {
     data: params
   })
 }
+
+// 建立流程模型
+export function getHistoryTask(params) {
+  return request({
+    url: '/activiti/task/getHistoryTask',
+    method: 'post',
+    data: params
+  })
+}
 // 删除流程模型
 export function deleteProcessDefind(params) {
   return request({

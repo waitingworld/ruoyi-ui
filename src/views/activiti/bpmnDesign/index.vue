@@ -268,7 +268,6 @@ export default {
     getProcessXmlByModelId(modelId) {
       this.loading = true
       getProcessXmlByModelId({modelId: modelId}).then(res => {
-        debugger
         this.loading = false
         this.xmlStr = res.data.xmlStr
         this.init()

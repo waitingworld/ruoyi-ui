@@ -2,19 +2,26 @@
   <div style="padding:20px;">
     <div>
       <el-descriptions>
-        <el-descriptions-item label="流程名称">{{ taskInfo.ProcessName }}</el-descriptions-item>
-        <el-descriptions-item label="当前任务名称">{{ taskInfo.Name }}</el-descriptions-item>
-        <el-descriptions-item label="流程开始时间">{{ taskInfo.CreateTime }}</el-descriptions-item>
-        <el-descriptions-item label="任务认领时间">{{ taskInfo.ClaimTime }}</el-descriptions-item>
-        <el-descriptions-item label="流程实例ID">{{ taskInfo.ProcessInstanceId }}</el-descriptions-item>
-        <el-descriptions-item label="任务ID">{{ taskInfo.Id }}</el-descriptions-item>
+        <el-descriptions-item label="流程名称">{{ taskInfo.processName }}</el-descriptions-item>
+        <el-descriptions-item label="当前任务名称">{{ taskInfo.name }}</el-descriptions-item>
+        <el-descriptions-item label="流程开始时间">{{ parseTime(taskInfo.createTime) }}</el-descriptions-item>
+        <el-descriptions-item label="任务认领时间">{{ parseTime(taskInfo.claimTime) }}</el-descriptions-item>
+        <el-descriptions-item label="流程实例ID">{{ taskInfo.processInstanceId }}</el-descriptions-item>
+        <el-descriptions-item label="任务ID">{{ taskInfo.id }}</el-descriptions-item>
       </el-descriptions>
     </div>
-    <div>
-      <el-button v-for="node in nextNodes" :key="node.Id" @click="openDialog(node)">{{ node.Name }}</el-button>
+    <div v-if="!disable">
+      <div v-show="nextNodes.length>0">
+        <el-button v-for="node in nextNodes" :key="node.Id" @click="openDialog(node)">{{ node.name }}</el-button>
+      </div>
+      <div v-show="nextNodes.length<=0">
+        <el-button @click="submit">提交</el-button>
+      </div>
     </div>
     <div>
-      <el-dialog title="选择下一步用户" :visible.sync="showUserChooseDialog" v-show="showUserChooseDialog" width="600px" append-to-body>
+      <el-dialog title="选择下一步用户" :visible.sync="showUserChooseDialog" v-show="showUserChooseDialog" width="950px"
+                 append-to-body
+      >
         <choose-user @close="()=>{showUserChooseDialog=false}" @setUser="submit"/>
       </el-dialog>
     </div>
@@ -24,6 +31,7 @@
 <script>
 import { getNextNode, getTaskInfo, completeTask } from '@/api/activiti/repository'
 import ChooseUser from '@/components/ChooseUser/chooseUser'
+import {parseTime} from '@/utils/ruoyi'
 
 export default {
   name: 'index',
@@ -32,6 +40,7 @@ export default {
     return {
       showUserChooseDialog: false,
       taskId: '',
+      disable: '',
       nextNodes: [],
       nextNode: {},
       nextNodeUser: {},
@@ -41,8 +50,11 @@ export default {
   },
   mounted() {
     this.taskId = this.$route.query.taskId
+    this.disable = this.$route.query.disable === 'true'
     this.getTaskInfo()
-    this.getNextNode()
+    if(!this.disable){
+      this.getNextNode()
+    }
   },
   methods: {
     getTaskInfo() {
@@ -57,7 +69,12 @@ export default {
     },
     submit(nextUserId) {
       let variablesJson = {}
-      variablesJson[this.nextNode.Assignee] = nextUserId
+      if (nextUserId) {
+        variablesJson[this.nextNode.assignee] = nextUserId
+      }
+      if (this.nextNodeWay[this.nextNode.id]) {
+        variablesJson[this.nextNodeWay[this.nextNode.id].code] = this.nextNodeWay[this.nextNode.id].val
+      }
       let submitParams = {
         taskId: this.taskId,
         variablesJson: variablesJson
@@ -65,6 +82,11 @@ export default {
       completeTask(submitParams).then(res => {
         if (res.data.success) {
           this.$message.success('提交成功')
+          this.$bus.emit('refresh')
+          this.$store.dispatch('tagsView/delView', this.$route)
+          this.$router.push({
+            path: 'workbench'
+          })
         }
       })
     },
@@ -77,12 +99,14 @@ export default {
     nextNodes: {
       handler(val) {
         this.nextNodes.forEach(node => {
-          this.nextNodeUser[node.Id] = node.Assignee
+          this.nextNodeUser[node.id] = node.assignee
           let wayStr = node['outgoingFlow_ConditionExpression']
-          wayStr = wayStr.substr(wayStr.indexOf('${') + 2, wayStr.lastIndexOf('}') - 2)
-          this.nextNodeWay[node.Id] = {
-            code: wayStr.split('==')[0],
-            val: wayStr.split('==')[1]
+          if (wayStr) {
+            wayStr = wayStr.substr(wayStr.indexOf('${') + 2, wayStr.lastIndexOf('}') - 2)
+            this.nextNodeWay[node.id] = {
+              code: wayStr.split('==')[0],
+              val: wayStr.split('==')[1]
+            }
           }
         })
       },

@@ -1,16 +1,24 @@
 <template>
   <div style="text-align: center;">
-    <el-table v-loading="loading" :data="tableData">
-      <el-table-column :prop="'ProcessName'" label="流程名" align="center"/>
-      <el-table-column :prop="'Name'" label="当前任务" align="center"/>
-      <el-table-column :prop="'CreateTime'" label="创建时间" align="center"/>
-      <el-table-column :prop="'CreateTime'" label="创建时间" align="center"/>
+    <el-table v-loading="loading" :data="tableData" stripe border height="550px">
+      <el-table-column :prop="'processName'" label="流程名" align="center"/>
+      <el-table-column :prop="'name'" label="当前任务" align="center"/>
+      <el-table-column :prop="'createTime'" label="流程开始时间" align="center" width="150">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :prop="'startTime'" label="任务开始时间" align="center" width="150">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.startTime) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot="header" slot-scope="scope">
           操作<el-button @click="getTableList" size="mini" type="text" icon="el-icon-refresh"/>
         </template>
         <template slot-scope="scope">
-          <el-button @click="dealForm(scope.row.Id)" size="mini" type="text">处理</el-button>
+          <el-button @click="dealForm(scope.row.id)" size="mini" type="text">处理</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -27,6 +35,7 @@
 
 <script>
 import { getTodoList } from '@/api/activiti/repository'
+import { parseTime } from '@/utils/ruoyi'
 
 export default {
   name: 'todoList',

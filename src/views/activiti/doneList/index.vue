@@ -1,9 +1,33 @@
 <template>
   <div style="text-align: center;">
-
-    <el-button size="mini" @click="getTableList">刷新</el-button>
-    <el-table v-loading="loading" :data="tableData">
-      <el-table-column/>
+    <el-table v-loading="loading" :data="tableData" stripe border height="550px">
+      <el-table-column :prop="'processName'" label="流程名" align="center"/>
+      <el-table-column :prop="'name'" label="当前任务" align="center"/>
+      <el-table-column :prop="'createTime'" label="流程开始时间" align="center" width="150">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.startTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :prop="'startTime'" label="任务结束时间" align="center" width="150">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.endTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :prop="'dueDate'" label="任务耗时" align="center">
+        <template slot-scope="scope">
+          <span>{{ (scope.row.dueDate) }}分</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center">
+        <template slot="header" slot-scope="scope">
+          操作
+          <el-button @click="getTableList" size="mini" type="text" icon="el-icon-refresh"/>
+        </template>
+        <template slot-scope="scope">
+          <el-button @click="dealForm(scope.row.id)" size="mini" type="text">详情</el-button>
+          <el-button @click="showBpmnView(scope.row)" size="mini" type="text">流程</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <pagination
@@ -13,16 +37,31 @@
       :layout="'total, sizes, prev, pager, next'"
       @pagination="getTableList"
     />
+    <el-dialog title="流程图"
+               class="hisDialog"
+               width="1000px"
+               style="height: 600px;"
+               :visible.sync="showBpmnViewFlag"
+               append-to-body @close="()=>{showBpmnViewFlag=false}"
+    >
+      <bpmn-view :model-id="modelId" :process-instance-id="processInstanceId"/>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { getDoneList } from '@/api/activiti/repository'
+import { parseTime } from '@/utils/ruoyi'
+import BpmnView from '@/components/BpmnJs/bpmnView/bpmnView'
 
 export default {
   name: 'doneList',
+  components: { BpmnView },
   data() {
     return {
+      modelId: '',
+      processInstanceId: '',
+      showBpmnViewFlag: false,
       loading: false,
       pageInfo: {
         pageNo: 1,
@@ -36,6 +75,17 @@ export default {
     this.getTableList()
   },
   methods: {
+    showBpmnView(data) {
+      this.showBpmnViewFlag = true
+      this.modelId = data.modelId
+      this.processInstanceId = data.processInstanceId
+    },
+    dealForm(taskId) {
+      this.$router.push({
+        path: 'formBus',
+        query: { taskId: taskId, disable: true }
+      })
+    },
     getTableList() {
       this.loading = true
       getDoneList(this.pageInfo).then(res => {
@@ -48,6 +98,5 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style>
 </style>

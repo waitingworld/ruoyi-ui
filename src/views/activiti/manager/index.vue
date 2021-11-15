@@ -352,7 +352,6 @@ export default {
     },
     // 流程删除
     deleteProcessDefind(process) {
-      debugger
       if (!process.deploymentId) {
         this.$message.error('当前流程未部署过，不能删除')
         return
