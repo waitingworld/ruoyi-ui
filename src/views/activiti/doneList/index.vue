@@ -18,7 +18,7 @@
           <span>{{ (scope.row.dueDate) }}分</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center" width="100">
         <template slot="header" slot-scope="scope">
           操作
           <el-button @click="getTableList" size="mini" type="text" icon="el-icon-refresh"/>
@@ -41,10 +41,12 @@
                class="hisDialog"
                width="1000px"
                style="height: 600px;"
+               v-if="showBpmnViewFlag"
                :visible.sync="showBpmnViewFlag"
-               append-to-body @close="()=>{showBpmnViewFlag=false}"
+               append-to-body
+               @close="()=>{showBpmnViewFlag=false}"
     >
-      <bpmn-view :model-id="modelId" :process-instance-id="processInstanceId"/>
+      <bpmn-view :process-instance-id="processInstanceId"/>
     </el-dialog>
   </div>
 </template>
@@ -59,13 +61,12 @@ export default {
   components: { BpmnView },
   data() {
     return {
-      modelId: '',
       processInstanceId: '',
       showBpmnViewFlag: false,
       loading: false,
       pageInfo: {
         pageNo: 1,
-        pageSize: 5,
+        pageSize: 10,
         total: 0
       },
       tableData: []
@@ -77,7 +78,6 @@ export default {
   methods: {
     showBpmnView(data) {
       this.showBpmnViewFlag = true
-      this.modelId = data.modelId
       this.processInstanceId = data.processInstanceId
     },
     dealForm(taskId) {

@@ -13,12 +13,13 @@
           <span>{{ parseTime(scope.row.startTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center" width="100">
         <template slot="header" slot-scope="scope">
           操作<el-button @click="getTableList" size="mini" type="text" icon="el-icon-refresh"/>
         </template>
         <template slot-scope="scope">
           <el-button @click="dealForm(scope.row.id)" size="mini" type="text">处理</el-button>
+          <el-button @click="showBpmnView(scope.row)" size="mini" type="text">流程</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -30,17 +31,32 @@
       :layout="'total, sizes, prev, pager, next'"
       @pagination="getTableList"
     />
+    <el-dialog title="流程图"
+               class="hisDialog"
+               width="1000px"
+               style="height: 600px;"
+               v-if="showBpmnViewFlag"
+               :visible.sync="showBpmnViewFlag"
+               append-to-body
+               @close="()=>{showBpmnViewFlag=false}"
+    >
+      <bpmn-view :process-instance-id="processInstanceId"/>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { getTodoList } from '@/api/activiti/repository'
 import { parseTime } from '@/utils/ruoyi'
+import BpmnView from '@/components/BpmnJs/bpmnView/bpmnView'
 
 export default {
   name: 'todoList',
+  components: { BpmnView },
   data() {
     return {
+      processInstanceId: '',
+      showBpmnViewFlag: false,
       loading: false,
       pageInfo: {
         pageNo: 1,
@@ -54,6 +70,10 @@ export default {
     this.getTableList()
   },
   methods: {
+    showBpmnView(data) {
+      this.showBpmnViewFlag = true
+      this.processInstanceId = data.processInstanceId
+    },
     dealForm(taskId) {
       this.$router.push({
         path: 'formBus',

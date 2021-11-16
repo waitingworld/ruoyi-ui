@@ -1,6 +1,6 @@
 <template>
   <div class="containers" v-loading="loading">
-    <el-row v-show="!onlyViewFlag">
+    <el-row>
       <el-col>
         <div>
           <el-button @click="handlerZoom(0.1)">放大</el-button>
@@ -33,15 +33,11 @@ import MoveModule from 'diagram-js/lib/features/move'
 import ModelingModule from 'bpmn-js/lib/features/modeling'
 import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas'
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll'
-import { getProcessXmlByModelId, getHistoryTask } from '@/api/activiti/repository'
+import { getProcessXmlByProcessInstanceId, getHistoryTask } from '@/api/activiti/repository'
 
 export default {
   name: 'bpmnView',
   props: {
-    modelId: {
-      type: String,
-      require: true
-    },
     processInstanceId: {
       type: String,
       require: true
@@ -51,7 +47,10 @@ export default {
     return {
       // bpmn建模器
       bpmnModeler: null,
+      elementRegistry: null,
       canvas: null,
+      highLightedShapes: [],
+      currentTasks: [],
       loading: false,
       camundaFlag: true,//是使用camunda,否则使用activiti
       onlyViewFlag: false,//仅显示主窗口标识
@@ -61,18 +60,19 @@ export default {
     }
   },
   methods: {
-    getProcessXmlByModelId(modelId) {
-      if (!modelId) {
+    getProcessXmlByProcessInstanceId(processInstanceId) {
+      if (!processInstanceId) {
         return
       }
       this.loading = true
-      getProcessXmlByModelId({ modelId: modelId }).then(res => {
+      getProcessXmlByProcessInstanceId({ processInstanceId: processInstanceId }).then(res => {
         if (!res.data.success) {
           this.$message.error(res.data.msg)
         } else {
           this.loading = false
           this.xmlStr = res.data.xmlStr
           this.init()
+          this.getHistoryTask(processInstanceId)
         }
       })
     },
@@ -108,8 +108,8 @@ export default {
           bindTo: window
         }
       })
+      this.elementRegistry = this.bpmnModeler.get('elementRegistry')
       this.createNewDiagram()
-      this.addListener()
     },
     async createNewDiagram() {
       // 将字符串转换成图显示出来
@@ -131,19 +131,19 @@ export default {
         console.log('出错了:', warnings, message)
       })
     },
-    addListener() {
-      this.bpmnModeler.on('shape.added', e => {
-        var elementRegistry = this.bpmnModeler.get('elementRegistry')
-        var shape = e.element ? elementRegistry.get(e.element.id) : e.shape
-        debugger
-        this.setColor(shape)
-      })
+    addSetColorListener(elementId, isCurrentTask) {
+      var shape = this.elementRegistry.get(elementId)
+      if (isCurrentTask) {
+        this.setColor(shape, 'red', '')
+      } else {
+        this.setColor(shape, 'green', '')
+      }
     },
-    setColor(node) {
+    setColor(node, strokeColor, fillColor) {
       let modeling = this.bpmnModeler.get('modeling')
       modeling.setColor(node, {
-        stroke: 'green',
-        fill: 'yellow'
+        stroke: strokeColor,
+        fill: fillColor
       })
     },
     handlerZoom(radio) {
@@ -153,22 +153,25 @@ export default {
       this.scale = newScale
     },
     getHistoryTask() {
-      getHistoryTask({ processInstanceId: this.processInstanceId }).then(res => {
+      getHistoryTask({ processInstanceId: this.processInstanceId }).then((res) => {
+        this.highLightedShapes = res.data.highLightedShapes
+        this.currentTasks = res.data.currentTask
+        this.highLightedShapes.forEach((elementId) => {
+          this.addSetColorListener(elementId, false)
+        })
         debugger
+        if (this.currentTasks && this.currentTasks.length > 0) {
+          this.currentTasks.forEach((elementId) => {
+            this.addSetColorListener(elementId, true)
+          })
+        }
       })
     }
   },
   watch: {
-    modelId: {
-      handler() {
-        this.getProcessXmlByModelId(this.modelId)
-      },
-      deep: true,
-      immediate: true
-    },
     processInstanceId: {
       handler() {
-        this.getHistoryTask(this.processInstanceId)
+        this.getProcessXmlByProcessInstanceId(this.processInstanceId)
       },
       deep: true,
       immediate: true
@@ -178,6 +181,15 @@ export default {
 </script>
 
 <style lang="scss">
-
+.djs-minimap.open .toggle:before {
+  content: '关闭小地图';
+}
+.djs-minimap .toggle:before {
+  content: '打开小地图';
+}
+.djs-minimap {
+  position: fixed;
+  border-radius: 8px;
+}
 </style>
 

@@ -36,10 +36,10 @@ export function deploymentByXml(params) {
   })
 }
 
-// 建立流程模型
-export function getProcessXmlByModelId(params) {
+// 获取流程xml
+export function getProcessXmlByProcessInstanceId(params) {
   return request({
-    url: '/activiti/repository/getProcessXmlByModelId',
+    url: '/activiti/repository/getProcessXmlByProcessInstanceId',
     method: 'post',
     data: params
   })
