@@ -37,6 +37,15 @@ export function deploymentByXml(params) {
 }
 
 // 获取流程xml
+export function getProcessXmlByModelId(params) {
+  return request({
+    url: '/activiti/repository/getProcessXmlByModelId',
+    method: 'post',
+    data: params
+  })
+}
+
+// 获取流程xml
 export function getProcessXmlByProcessInstanceId(params) {
   return request({
     url: '/activiti/repository/getProcessXmlByProcessInstanceId',

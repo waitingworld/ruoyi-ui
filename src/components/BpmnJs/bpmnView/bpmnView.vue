@@ -159,7 +159,6 @@ export default {
         this.highLightedShapes.forEach((elementId) => {
           this.addSetColorListener(elementId, false)
         })
-        debugger
         if (this.currentTasks && this.currentTasks.length > 0) {
           this.currentTasks.forEach((elementId) => {
             this.addSetColorListener(elementId, true)

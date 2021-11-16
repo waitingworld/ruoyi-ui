@@ -1,5 +1,5 @@
 <template>
-  <div class="containers bpmn-design-container" style="width: 99%;height: 90%;" v-loading="loading">
+  <div class="containers bpmn-design-container" style="" v-loading="loading">
     <el-row v-show="!onlyViewFlag">
       <el-col>
         <div>
@@ -17,14 +17,14 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="showXmlFlag?12:24">
-        <div class="row-height">
-          <div class="canvas" ref="canvas" :style="{width:showXmlFlag?'64%':'82%'}" STYLE="height: 95%;"></div>
-          <div id="js-properties-panel" class="panel" :style="{right:showXmlFlag?'51%':0}" v-show="!onlyViewFlag"></div>
+      <el-col :span="showXmlFlag?16:24">
+        <div class="row-height" style="position: relative;">
+          <div class="canvas" ref="canvas" style="display: inline-block;" :style="{'width':showXmlFlag?'630px':'1075px'}"></div>
+          <div id="js-properties-panel" class="panel" style="display: inline-block;width:240px;height: 600px;" v-show="!onlyViewFlag"></div>
           <input type="file" id="files" ref="refFile" v-show="false" @change="loadBPMN"/>
         </div>
       </el-col>
-      <el-col :span="showXmlFlag?12:0" v-show="!onlyViewFlag">
+      <el-col :span="showXmlFlag?8:0" v-show="!onlyViewFlag">
         <div class="row-height">
           <codemirror ref="cmEditor" v-model="xmlStr" :value="xmlStr" :options="cmOptions" @changes="codeChange"/>
         </div>
@@ -46,8 +46,8 @@ import camundaPropertiesProviderModule from 'bpmn-js-properties-panel/lib/provid
 //camunda描述文件
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda'
 
-// import activitiPropertiesPanelModule from 'bpmn-js-properties-panel-activiti';
-// import activitiPropertiesProviderModule from 'bpmn-js-properties-panel-activiti/lib/provider/activiti';
+import activitiPropertiesPanelModule from 'bpmn-js-properties-panel-activiti';
+import activitiPropertiesProviderModule from 'bpmn-js-properties-panel-activiti/lib/provider/activiti';
 import activitiModdleDescriptor from 'activiti-bpmn-moddle/resources/activiti.json';
 //翻译模块
 import customTranslate from '@/components/BpmnJs/customTranslate/customTranslate'
@@ -72,7 +72,7 @@ export default {
       bpmnModeler: null,
       canvas: null,
       loading: false,
-      camundaFlag: true,//是使用camunda,否则使用activiti
+      camundaFlag: false,//是使用camunda,否则使用activiti
       onlyViewFlag: false,//仅显示主窗口标识
       miniMapOpenFlag: true,//小地图开关
       showXmlFlag: false,//xml编辑器开关
@@ -119,21 +119,17 @@ export default {
         tokenSimulation
       ];
       var moddleExtensions = {}
-      // 左边工具栏以及节点
-      additionalModules.push(camundaPropertiesProviderModule)
-      // 右边的工具栏
-      additionalModules.push(camundaPropertiesPanelModule)
       if (this.camundaFlag) {
         // // 左边工具栏以及节点
-        // additionalModules.push(camundaPropertiesProviderModule)
+        additionalModules.push(camundaPropertiesProviderModule)
         // // 右边的工具栏
-        // additionalModules.push(camundaPropertiesPanelModule)
+        additionalModules.push(camundaPropertiesPanelModule)
         moddleExtensions = {camunda: camundaModdleDescriptor}
       } else {
         // // 左边工具栏以及节点
-        // additionalModules.push(activitiPropertiesProviderModule)
+        additionalModules.push(activitiPropertiesProviderModule)
         // // 右边的工具栏
-        // additionalModules.push(activitiPropertiesPanelModule)
+        additionalModules.push(activitiPropertiesPanelModule)
         moddleExtensions = {activiti: activitiModdleDescriptor}
       }
       // 建模，官方文档这里讲的很详细
@@ -305,12 +301,11 @@ export default {
 }
 
 .canvas {
-  width: 100%;
   height: 100%;
 }
 
 .row-height {
-  height: 850px;
+  height: 600px;
 }
 
 .CodeMirror {
@@ -323,15 +318,16 @@ export default {
 
 .panel {
   position: absolute;
-  right: 0;
+  right: 10px;
+  overflow-y: auto;
   top: 0;
-  width: 300px;
 }
 
-//.djs-minimap {
-//  margin-right: 15%;
-//  //margin-right: 50%;
-//}
+.djs-minimap {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
 
 .bpp-properties {
   width: 90%;
