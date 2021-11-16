@@ -60,15 +60,14 @@ import 'codemirror/addon/search/search'
 import 'codemirror/addon/search/searchcursor'
 import 'codemirror/addon/dialog/dialog'
 import 'codemirror/addon/dialog/dialog.css'
-//令牌模拟
-import 'bpmn-js-token-simulation/assets/css/bpmn-js-token-simulation.css'
-import 'bpmn-js-token-simulation/assets/css/normalize.css'
-import 'bpmn-js-token-simulation/assets/font-awesome/css/font-awesome.min.css'
-import 'bpmn-js-token-simulation/assets/font-awesome/fonts/fontawesome-webfont.eot'
-import 'bpmn-js-token-simulation/assets/font-awesome/fonts/fontawesome-webfont.svg'
-import 'bpmn-js-token-simulation/assets/font-awesome/fonts/fontawesome-webfont.ttf'
-import 'bpmn-js-token-simulation/assets/font-awesome/fonts/fontawesome-webfont.woff'
-import 'bpmn-js-token-simulation/assets/font-awesome/fonts/fontawesome-webfont.woff2'
+
+import { vuePlugin } from "@/components/BpmnJs/highlight";
+import "highlight.js/styles/atom-one-dark-reasonable.css";
+Vue.use(vuePlugin);
+
+import MyPD from "@/components/BpmnJs/index.js";
+Vue.use(MyPD);
+import "@/components/BpmnJs/theme/index.scss";
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
