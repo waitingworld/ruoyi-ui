@@ -61,9 +61,9 @@ import 'codemirror/addon/search/searchcursor'
 import 'codemirror/addon/dialog/dialog'
 import 'codemirror/addon/dialog/dialog.css'
 
-import { vuePlugin } from "@/components/BpmnJs/highlight";
+import hljs from "@/components/BpmnJs/highlight/index";
 import "highlight.js/styles/atom-one-dark-reasonable.css";
-Vue.use(vuePlugin);
+Vue.use(hljs);
 
 import MyPD from "@/components/BpmnJs/index.js";
 Vue.use(MyPD);
