@@ -25,6 +25,15 @@ export function getDept(deptId) {
   })
 }
 
+// 查询部门详细
+export function getDeptByParentId(parentId) {
+  return request({
+    url: '/system/dept/getDeptByParentId',
+    method: 'post',
+    data: {parentId: parentId}
+  })
+}
+
 // 查询部门下拉树结构
 export function treeselect() {
   return request({

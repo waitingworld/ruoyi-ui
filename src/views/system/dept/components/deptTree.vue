@@ -55,8 +55,9 @@ export default {
   },
   methods: {
     getDeptTree(node, resolve) {
-      getUserProfile().then(response => {
-        this.userInfo = response.data
+      // getUserProfile().then(response => {
+      //   this.userInfo = response.data
+        this.userInfo = { deptId:'100' }
         if (node.level === 0) {
           //首次加载,根据角色进行初始化,不同的角色看到的根节点不一样
           getDept(this.userInfo.deptId).then(response => {
@@ -76,7 +77,7 @@ export default {
             resolve(tmp)
           })
         }
-      })
+      // })
 
     },
     getRootDept() {
