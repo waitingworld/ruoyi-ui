@@ -2,6 +2,24 @@
   <!-- 导入表 -->
   <el-dialog title="导入表" :visible.sync="visible" width="800px" top="5vh" append-to-body>
     <el-form :model="queryParams" ref="queryForm" :inline="true">
+      <el-form-item label="数据库" prop="DBName">
+        <el-input
+          v-model="queryParams.DBName"
+          placeholder="请输入表名称"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="用户名称" prop="userName">
+        <el-input
+          v-model="queryParams.userName"
+          placeholder="请输入表名称"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="表名称" prop="tableName">
         <el-input
           v-model="queryParams.tableName"
@@ -65,6 +83,8 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        DBName: undefined,
+        userName: undefined,
         tableName: undefined,
         tableComment: undefined
       }
