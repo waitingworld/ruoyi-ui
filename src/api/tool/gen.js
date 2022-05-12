@@ -8,12 +8,30 @@ export function listTable(query) {
     params: query
   })
 }
+
 // 查询db数据库列表
 export function listDbTable(query) {
   return request({
     url: '/tool/gen/db/list',
     method: 'get',
     params: query
+  })
+}
+
+// 查询db数据库列表
+export function queryDBList() {
+  return request({
+    url: '/tool/gen/queryDBList',
+    method: 'post'
+  })
+}
+
+// 查询db数据库列表
+export function getUserList(dbName) {
+  return request({
+    url: '/tool/gen/queryUserListByDbName',
+    method: 'get',
+    params: { dbName: dbName }
   })
 }
 
